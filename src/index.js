@@ -10,20 +10,53 @@ app.use(cors());
 const users = [];
 
 function checksExistsUserAccount(request, response, next) {
-  // Complete aqui
+  const { username } = request.headers;
+
+  const user = users.find(user => user.username === username);
+
+  if(!user) return response.status(404).json({error: 'User not found'});
+
+  request.user = user;
+
+  return next();
 }
 
 function checksCreateTodosUserAvailability(request, response, next) {
-  // Complete aqui
+  const { user } = request;
+
+  if(user.pro === false && user.todos.length > 9) {
+    return response.status(403).json({error: 'This user is not a pro plan!'})
+  }
+
+  next();
+
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
+  const { username } = request.headers;
+  const { id } = request.params;
+
+  const user = users.find(user => user.username === username);
+
+  if(!user) return response.status(404).json({error: 'User not found!'});
+  if(!validate(id)) return response.status(400).json({error: 'Id is not UUID!'});
+
+  const validateTodo = users.todos.find(todo => todo.id === id);
+
+  if(!validateTodo) return response.status(404).json({error: 'Todo not found!'});
+
+  request.user = user;
+  request.todo = validateTodo;
+
+  return next();
+
 }
 
 function findUserById(request, response, next) {
-  // Complete aqui
+
+  const 
 }
+
 
 app.post('/users', (request, response) => {
   const { name, username } = request.body;
